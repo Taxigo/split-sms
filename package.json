@@ -39,6 +39,7 @@
   },
   "license": "MIT",
   "dependencies": {
-    "buffer": "^3.5.0"
+    "buffer": "^3.5.0",
+    "iconv-lite": "^0.4.11"
   }
 }
