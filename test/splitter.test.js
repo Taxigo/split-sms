@@ -3,6 +3,7 @@ var gsmSplitter = require('../lib/gsmsplitter'),
     unicodeSplitter = require('../lib/unicodesplitter'),
     gsmTestData = require('./testdata/gsm.test.json'),
     unicodeTestData = require('./testdata/unicode.test.json');
+const gsmEncodings = require('../lib/gsm-encodings');
 
 function testMessage(testData, splitterFunction) {
 
@@ -11,7 +12,7 @@ function testMessage(testData, splitterFunction) {
     var result;
 
     before(function () {
-      result = splitterFunction(testData.message);
+      result = splitterFunction(testData.message, { encoding: gsmEncodings[0] });
     });
 
     it('should have ' + testData.parts.length + ' parts', function () {
@@ -53,7 +54,7 @@ function testMessageSummary(testData, splitterFunction) {
     var result;
 
     before(function () {
-      result = splitterFunction(testData.message, { summary: true });
+      result = splitterFunction(testData.message, { summary: true, encoding: gsmEncodings[0] });
     });
 
     it('should have ' + testData.parts.length + ' parts', function () {

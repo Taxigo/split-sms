@@ -35,6 +35,7 @@ gulp.task('build', function() {
     builtins: false,
     insertGlobals: false
   })
+  .transform("babelify", { presets: ["es2015"] })
   .bundle()
   .pipe(source('split-sms.js'))
   .pipe(gulp.dest('dist'));

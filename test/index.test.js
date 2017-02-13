@@ -23,17 +23,18 @@ describe('Split-SMS', function () {
         parts: [{
           content: "1234",
           length: 4,
-          bytes: 4
+          bytes: 4,
         }],
         totalLength: 3636,
-        totalBytes: 68678
+        totalBytes: 68678,
+        totalInPart: 160
       };
 
       validateMessageStub = sinon.stub().returns(true);
       splitStub = sinon.stub().returns(splitResult);
 
       var splitter = proxyquire('../lib/index', {
-        './gsmvalidator': { validateMessage: validateMessageStub },
+        './gsm-encodings': [ { validator: { validateMessage: validateMessageStub } } ],
         './gsmsplitter': { split: splitStub }
       });
 
@@ -83,7 +84,8 @@ describe('Split-SMS', function () {
           bytes: 0
         }],
         totalLength: 0,
-        totalBytes: 0
+        totalBytes: 0,
+        totalInPart: 160
       };
 
       var splitter = proxyquire('../lib/index', {
@@ -128,11 +130,12 @@ describe('Split-SMS', function () {
           bytes: 160
         }],
         totalLength: 345,
-        totalBytes: 45
+        totalBytes: 45,
+        totalInPart: 160
       };
 
       var splitter = proxyquire('../lib/index', {
-        './gsmvalidator': { validateMessage: sinon.stub().returns(true) },
+        './gsm-encodings': [ { validator: { validateMessage: sinon.stub().returns(true) } } ],
         './gsmsplitter': { split: sinon.stub().returns(splitResult) }
       });
 
@@ -158,11 +161,12 @@ describe('Split-SMS', function () {
           bytes: 4
         }],
         totalLength: 3636,
-        totalBytes: 68678
+        totalBytes: 68678,
+        totalInPart: 153
       };
 
       var splitter = proxyquire('../lib/index', {
-        './gsmvalidator': { validateMessage: sinon.stub().returns(true) },
+        './gsm-encodings': [ { validator: { validateMessage: sinon.stub().returns(true) } } ],
         './gsmsplitter': { split: sinon.stub().returns(splitResult) }
       });
 
@@ -193,14 +197,15 @@ describe('Split-SMS', function () {
             bytes: 8
           }],
           totalLength: 234,
-          totalBytes: 345
+          totalBytes: 345,
+          totalInPart: 140
         };
 
         validateMessageStub = sinon.stub().returns(false);
         splitStub = sinon.stub().returns(splitResult);
 
         var splitter = proxyquire('../lib/index', {
-          './gsmvalidator': { validateMessage: validateMessageStub },
+          './gsm-encodings': [ { validator: { validateMessage: validateMessageStub } } ],
           './unicodesplitter': { split: splitStub }
         });
 
@@ -245,19 +250,20 @@ describe('Split-SMS', function () {
       before(function () {
         splitResult = {
           parts: [{
-            length: 70,
+            length: 140,
             bytes: 140
           }],
           totalLength: 777,
-          totalBytes: 666
+          totalBytes: 666,
+          totalInPart: 140
         };
 
         var splitter = proxyquire('../lib/index', {
-          './gsmvalidator': { validateMessage: sinon.stub().returns(false) },
+          './gsm-encodings': [ { validator: { validateMessage: sinon.stub().returns(false) } } ],
           './unicodesplitter': { split: sinon.stub().returns(splitResult) }
         });
 
-        result = splitter.split('Some Message');
+        result = splitter.split('Some Message', { characterset: splitter.UNICODE });
       });
 
       it('should have the expected characters remaining', function () {
@@ -279,21 +285,21 @@ describe('Split-SMS', function () {
             bytes: 8
           }],
           totalLength: 888,
-          totalBytes: 999
+          totalBytes: 999,
+          totalInPart: 134
         };
 
         var splitter = proxyquire('../lib/index', {
-          './gsmvalidator': { validateMessage: sinon.stub().returns(false) },
+          './gsm-encodings': [ { validator: { validateMessage: sinon.stub().returns(false) } } ],
           './unicodesplitter': { split: sinon.stub().returns(splitResult) }
         });
 
-        result = splitter.split('Some Message');
+        result = splitter.split('Some Message', { characterset: splitter.UNICODE });
       });
 
       it('should have the expected characters remaining', function () {
         assert.strictEqual(result.remainingInPart, 63);
       });
-
   });
 
   describe('Split GSM single part message with characterset Unicode option', function () {
@@ -313,7 +319,8 @@ describe('Split-SMS', function () {
           bytes: 140
         }],
         totalLength: 3636,
-        totalBytes: 68678
+        totalBytes: 68678,
+        totalInPart: 140
       };
 
       splitStub = sinon.stub().returns(splitResult);
@@ -368,7 +375,8 @@ describe('Split-SMS', function () {
           bytes: 160
         }],
         totalLength: 451,
-        totalBytes: 463
+        totalBytes: 463,
+        totalInPart: 160
       };
 
       splitStub = sinon.stub().returns(splitResult);
