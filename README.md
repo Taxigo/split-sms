@@ -55,6 +55,18 @@ splitter.split('Snowman shows off! ☃');
 }
 ```
 
+## Options
+
+### providerReservedCharacters
+
+This option reserves the specified number of characters in the end of the message for a provider specific id.
+
+Usage:
+
+```js
+splitter.split('Snowman shows off! ☃' { prodiverReservedCharacters: 5 });
+```
+
 ## In The Browser
 
 You can use Bower to install split-sms components:
