@@ -247,6 +247,7 @@ module.exports.split = function (message, options) {
     buffer: false,
     summary: false
   };
+  options.providerReservedBytes = options.providerReservedBytes || 0;
   var gsmvalidator = (options.encoding || {}).validator;
 
   if (message === '') {
@@ -308,6 +309,11 @@ module.exports.split = function (message, options) {
 
   if (bytes > 0) bank();
 
+  var lastByteIndex = !messages[1] ? 160 : isLastByte(1);
+  if (messages[messages.length - 1].length + options.providerReservedBytes > lastByteIndex) {
+    bank();
+  }
+
   if (fitsOneMessage()) {
     return {
       parts: [{
@@ -353,7 +359,7 @@ module.exports.split = function (message, options) {
   }
 
   function fitsOneMessage() {
-    return !!messages[1] && totalBytes <= 160 - singleUdhLength();
+    return !!messages[1] && totalBytes <= 160 - options.providerReservedBytes - singleUdhLength();
   }
   function isLastByte(currentCharByteLength) {
     return 160 - multiUdhLength() - currentCharByteLength;
@@ -382,7 +388,8 @@ module.exports.split = function (message, options) {
   options = {
     useShiftTables: options && options.useShiftTables,
     buffer: options && options.buffer,
-    summary: options && options.summary
+    summary: options && options.summary,
+    providerReservedBytes: options && options.providerReservedBytes || 0
   };
 
   options.encoding = (options.useShiftTables ? gsmEncodings : [gsmEncodings[0]]).find(function (encoding) {
