@@ -363,7 +363,7 @@ module.exports.split = function (message, options) {
   }
 
   function fitsOneMessage() {
-    return !!messages[1] && totalBytes <= 160 - options.providerReservedCharacters - singleUdhLength();
+    return messages.length <= 2 && totalBytes <= 160 - options.providerReservedCharacters - singleUdhLength();
   }
   function isLastByte(currentCharByteLength) {
     return 160 - multiUdhLength() - currentCharByteLength;
