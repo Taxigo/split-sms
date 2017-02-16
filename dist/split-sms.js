@@ -247,7 +247,7 @@ module.exports.split = function (message, options) {
     buffer: false,
     summary: false
   };
-  options.providerReservedBytes = options.providerReservedBytes || 0;
+  options.providerReservedCharacters = options.providerReservedCharacters || 0;
   var gsmvalidator = (options.encoding || {}).validator;
 
   if (message === '') {
@@ -286,6 +286,13 @@ module.exports.split = function (message, options) {
     messagePart = '';
   }
 
+  function addSparePartForReservedProviderCharacters() {
+    var lastByteIndex = !messages[1] ? 160 : isLastByte(1);
+    if (messages[messages.length - 1].length + options.providerReservedCharacters > lastByteIndex) {
+      bank();
+    }
+  }
+
   for (var i = 0, count = message.length; i < count; i++) {
     var c = message.charAt(i);
 
@@ -309,10 +316,7 @@ module.exports.split = function (message, options) {
 
   if (bytes > 0) bank();
 
-  var lastByteIndex = !messages[1] ? 160 : isLastByte(1);
-  if (messages[messages.length - 1].length + options.providerReservedBytes > lastByteIndex) {
-    bank();
-  }
+  addSparePartForReservedProviderCharacters();
 
   if (fitsOneMessage()) {
     return {
@@ -359,7 +363,7 @@ module.exports.split = function (message, options) {
   }
 
   function fitsOneMessage() {
-    return !!messages[1] && totalBytes <= 160 - options.providerReservedBytes - singleUdhLength();
+    return !!messages[1] && totalBytes <= 160 - options.providerReservedCharacters - singleUdhLength();
   }
   function isLastByte(currentCharByteLength) {
     return 160 - multiUdhLength() - currentCharByteLength;
@@ -389,7 +393,7 @@ module.exports.split = function (message, options) {
     useShiftTables: options && options.useShiftTables,
     buffer: options && options.buffer,
     summary: options && options.summary,
-    providerReservedBytes: options && options.providerReservedBytes || 0
+    providerReservedCharacters: options && options.providerReservedCharacters || 0
   };
 
   options.encoding = (options.useShiftTables ? gsmEncodings : [gsmEncodings[0]]).find(function (encoding) {
@@ -441,6 +445,7 @@ module.exports.split = function (message, options) {
     buffer: false,
     summary: false
   };
+  options.providerReservedCharacters = options.providerReservedCharacters || 0;
 
   if (message === '') {
     return {
@@ -479,6 +484,13 @@ module.exports.split = function (message, options) {
     bytes = 0;
   }
 
+  function addSparePartForReservedProviderCharacters() {
+    var lastCharIndex = messages[0].length > 70 - options.providerReservedCharacters || !messages[1] ? 70 : 67;
+    if (messages[messages.length - 1].length + options.providerReservedCharacters > lastCharIndex) {
+      bank();
+    }
+  }
+
   for (var i = 0, count = message.length; i < count; i++) {
 
     var code = message.charCodeAt(i);
@@ -498,7 +510,9 @@ module.exports.split = function (message, options) {
 
   if (bytes > 0) bank();
 
-  if (messages[1] && totalBytes <= 140) {
+  addSparePartForReservedProviderCharacters();
+
+  if (messages[1] && totalBytes + options.providerReservedCharacters * 2 <= 140) {
     return {
       parts: [{
         content: options.summary ? undefined : options.buffer ? iconv.encode(message, 'utf16-be') : message,

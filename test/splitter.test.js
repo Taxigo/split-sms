@@ -12,7 +12,7 @@ function testMessage(testData, splitterFunction) {
     var result;
 
     before(function () {
-      result = splitterFunction(testData.message, { encoding: gsmEncodings[0], providerReservedBytes: testData.providerReservedBytes });
+      result = splitterFunction(testData.message, { encoding: gsmEncodings[0], providerReservedCharacters: testData.providerReservedCharacters });
     });
 
     it('should have ' + testData.parts.length + ' parts', function () {
@@ -54,7 +54,7 @@ function testMessageSummary(testData, splitterFunction) {
     var result;
 
     before(function () {
-      result = splitterFunction(testData.message, { summary: true, encoding: gsmEncodings[0], providerReservedBytes: testData.providerReservedBytes });
+      result = splitterFunction(testData.message, { summary: true, encoding: gsmEncodings[0], providerReservedCharacters: testData.providerReservedCharacters });
     });
 
     it('should have ' + testData.parts.length + ' parts', function () {
