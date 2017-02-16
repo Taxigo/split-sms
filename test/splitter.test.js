@@ -12,7 +12,7 @@ function testMessage(testData, splitterFunction) {
     var result;
 
     before(function () {
-      result = splitterFunction(testData.message, { encoding: gsmEncodings[0] });
+      result = splitterFunction(testData.message, { encoding: gsmEncodings[0], providerReservedBytes: testData.providerReservedBytes });
     });
 
     it('should have ' + testData.parts.length + ' parts', function () {
@@ -89,7 +89,7 @@ function testMessageSummary(testData, splitterFunction) {
 
 }
 
-describe('SMS Splitter', function () {
+describe.only('SMS Splitter', function () {
 
   describe('GSM Message', function () {
 
